@@ -10,6 +10,7 @@ from helpers import (
     extract_issn, get_journal_info, get_all_works, works_to_issues,
     sort_issues, parse_manual_text, merge_issues,
     issues_to_dataframe, dataframe_to_excel, generate_claude_prompt,
+    filter_by_holdings_range, get_volume_year_map,
 )
 
 # ── PAGE CONFIG ──────────────────────────────────────────────────────────────
@@ -24,7 +25,6 @@ st.title('📚 Serials Holdings Cataloging Tool')
 st.caption('Hood College Library — v1: Alma Item Records Generator')
 
 # ── SESSION STATE ────────────────────────────────────────────────────────────
-# Session state persists data between Streamlit reruns (every button click reruns the script).
 
 DEFAULTS = {
     'step': 1,
@@ -37,6 +37,11 @@ DEFAULTS = {
     'holding_id': '',
     'df': None,
     'crossref_done': False,
+    # Holdings range (set in Step 3)
+    'holdings_start_vol': None,
+    'holdings_end_vol': None,
+    # Special items: indexes, supplements, parts (accumulated in Step 3)
+    'special_entries': [],
 }
 
 for key, val in DEFAULTS.items():
@@ -71,6 +76,11 @@ if st.session_state.step == 1:
         'Type the ISSN directly (e.g. **0046-4813**), or paste any URL for the journal — '
         'the tool will find the ISSN automatically.'
     )
+    st.caption(
+        '💡 Journals have two ISSNs: one for the print edition and one for the electronic edition. '
+        'CrossRef stores records under the electronic ISSN. If the lookup returns no results, '
+        'try the other ISSN — it may be printed on the journal cover or masthead.'
+    )
 
     user_input = st.text_input(
         'ISSN or URL',
@@ -85,7 +95,7 @@ if st.session_state.step == 1:
             found = extract_issn(user_input.strip())
             if found:
                 st.session_state.issn = found
-                st.session_state.crossref_done = False  # reset so step 3 fetches fresh
+                st.session_state.crossref_done = False
                 go(2)
                 st.rerun()
             else:
@@ -117,14 +127,13 @@ elif st.session_state.step == 2:
 
 
 # ═══════════════════════════════════════════════════════════════════════════
-# STEP 3 — CROSSREF DISCOVERY + GAP HANDLING
+# STEP 3 — CROSSREF DISCOVERY + HOLDINGS RANGE + GAP HANDLING
 # ═══════════════════════════════════════════════════════════════════════════
 
 elif st.session_state.step == 3:
     st.header('Step 3 — Discover Journal Issues')
     issn = st.session_state.issn
 
-    # Only call the API once — results are stored in session state
     if not st.session_state.crossref_done:
         with st.spinner(f'Looking up ISSN {issn} in CrossRef — this may take a moment…'):
             info = get_journal_info(issn)
@@ -138,7 +147,7 @@ elif st.session_state.step == 3:
     issues = st.session_state.crossref_issues
     title = st.session_state.journal_title
 
-    # ── Show what CrossRef returned ──────────────────────────────────────────
+    # ── What CrossRef returned ───────────────────────────────────────────────
     if title:
         st.subheader(f'"{title}"')
 
@@ -153,7 +162,7 @@ elif st.session_state.step == 3:
         with st.expander('Preview first 10 issues found'):
             st.table([
                 {'Volume': i['volume'], 'Issue': i['issue'],
-                 'Year': i['year'], 'Month': i['month']}
+                 'Year': i['year'], 'Month/Season': i['month']}
                 for i in issues[:10]
             ])
     else:
@@ -166,11 +175,71 @@ elif st.session_state.step == 3:
 
     st.divider()
 
+    # ── Hood College holdings range ──────────────────────────────────────────
+    start_vol_sel = None
+    end_vol_sel = None
+
+    if issues:
+        vol_year_map = get_volume_year_map(issues)
+        vols_sorted = sorted(vol_year_map.keys())
+
+        if len(vols_sorted) > 1:
+            st.subheader('Hood College holdings range')
+            st.write(
+                "CrossRef found the full published run. Select the **first** and **last** volume "
+                "that Hood College physically owns — records outside this range will be excluded."
+            )
+
+            # Restore previous selection if the user navigated back
+            saved_start = st.session_state.holdings_start_vol
+            saved_end = st.session_state.holdings_end_vol
+            start_default = vols_sorted.index(saved_start) if saved_start in vols_sorted else 0
+            end_default = vols_sorted.index(saved_end) if saved_end in vols_sorted else len(vols_sorted) - 1
+
+            col1, col2 = st.columns(2)
+            with col1:
+                start_vol_sel = st.selectbox(
+                    'First volume Hood College owns',
+                    options=vols_sorted,
+                    format_func=lambda v: f'v.{v}  ({vol_year_map[v]})' if vol_year_map.get(v) else f'v.{v}',
+                    index=start_default,
+                )
+            with col2:
+                end_vol_sel = st.selectbox(
+                    'Last volume Hood College owns',
+                    options=vols_sorted,
+                    format_func=lambda v: f'v.{v}  ({vol_year_map[v]})' if vol_year_map.get(v) else f'v.{v}',
+                    index=end_default,
+                )
+
+            if start_vol_sel is not None and end_vol_sel is not None:
+                kept = filter_by_holdings_range(issues, start_vol_sel, end_vol_sel)
+                excluded_count = len(issues) - len(kept)
+                if excluded_count > 0:
+                    st.caption(
+                        f'{len(kept)} records within this range · '
+                        f'{excluded_count} records outside the range will be excluded.'
+                    )
+                else:
+                    st.caption(f'All {len(issues)} CrossRef records are within this range.')
+
+            # TODO: For active / ongoing subscriptions the "last volume" approach needs revisiting.
+            # Check with supervisor about how to handle journals Hood is still currently receiving.
+            st.caption(
+                '📝 *Note: this assumes Hood\'s run of the journal has a definite end. '
+                'If Hood is still actively receiving this journal, check with your supervisor '
+                'about how to handle the open end before importing.*'
+            )
+
+    st.divider()
+
     # ── Manual supplement ────────────────────────────────────────────────────
     st.subheader('Add records that CrossRef is missing')
     st.write(
         'If early volumes are missing, or this journal has no electronic version, '
-        'you can extract the data from physical journals using Claude.ai and paste it here.'
+        'you can extract the data from physical journals using Claude.ai and paste it here. '
+        'Accepted formats: single month (Apr), combined months (Jan/Feb, Jan-Mar), '
+        'or seasons (Spring, Fall/Winter).'
     )
 
     with st.expander('📋 Get the Claude extraction prompt (click to expand)'):
@@ -187,19 +256,113 @@ elif st.session_state.step == 3:
 
     manual_text = st.text_area(
         'Paste extracted records here — one issue per line  '
-        '(e.g.  v.1 n.1 Apr 1969)',
+        '(e.g.  v.1 n.1 Apr 1969  or  v.2 n.1 Spring 1970  or  v.3 n.1-2 Jan/Feb 1971)',
         value=st.session_state.manual_text,
         height=180,
-        placeholder='v.1 n.1 Apr 1969\nv.1 n.2 Jul 1969\nv.1 n.3 Oct 1969\nv.2 n.1 Jan 1970',
+        placeholder=(
+            'v.1 n.1 Apr 1969\n'
+            'v.1 n.2 Jan/Feb 1970\n'
+            'v.2 n.1 Spring 1971\n'
+            'v.2 n.3-4 1972'
+        ),
     )
     st.session_state.manual_text = manual_text
+
+    st.divider()
+
+    # ── Index and supplement entries ─────────────────────────────────────────
+    st.subheader('Add index or supplement entries')
+    st.write(
+        'Use this for items that are not regular numbered issues: cumulative indexes, '
+        'supplements, parts, or other special items. These are rarely in CrossRef.'
+    )
+
+    with st.expander('➕ Add an index, supplement, or part entry'):
+        with st.form('special_entry_form', clear_on_submit=True):
+            col0, col1 = st.columns(2)
+            with col0:
+                se_type = st.selectbox(
+                    'Type',
+                    ['Index', 'Supplement', 'Part', 'Special'],
+                    help='Index = cumulative index volume. Supplement/Part = accompanying issue.'
+                )
+                se_vol = st.text_input(
+                    'Volume (or volume range for Index)',
+                    placeholder='e.g.  1-10  for an index, or  5  for a supplement to v.5',
+                )
+            with col1:
+                se_desc = st.text_input(
+                    'Descriptor — leave blank for Index (auto-filled)',
+                    placeholder='e.g.  Suppl. 1   or   Part 2',
+                    help='For Index this is always "Index" and can be left blank. '
+                         'For Supplement/Part, enter the label as it appears on the item.'
+                )
+                se_year = st.number_input(
+                    'Year published', min_value=1800, max_value=2100, value=2000, step=1
+                )
+                se_month = st.text_input(
+                    'Month/Season (optional)',
+                    placeholder='Spring, Jan/Feb, Oct — leave blank if unknown',
+                )
+
+            submitted = st.form_submit_button('Add this entry')
+
+        # Process outside the form block
+        if submitted:
+            if not se_vol.strip():
+                st.error('Volume (or volume range) is required.')
+            else:
+                issue_val = se_desc.strip() if se_desc.strip() else se_type
+                new_entry = {
+                    'volume': se_vol.strip(),
+                    'issue': issue_val,
+                    'year': int(se_year) if se_year else None,
+                    'month': se_month.strip(),
+                    'is_duplicate': False,
+                    'source': 'Manual',
+                    'missing': False,
+                    'item_type': se_type.lower(),
+                }
+                st.session_state.special_entries.append(new_entry)
+                st.rerun()
+
+        if st.session_state.special_entries:
+            st.write('**Entries added so far:**')
+            for i, entry in enumerate(st.session_state.special_entries):
+                date_str = f"{entry.get('month', '')} {entry.get('year', '')}".strip()
+                label = (
+                    f"**{entry['item_type'].title()}** — "
+                    f"v.{entry['volume']}, {entry['issue']}"
+                    + (f' ({date_str})' if date_str else '')
+                )
+                col_a, col_b = st.columns([11, 1])
+                col_a.markdown(label)
+                if col_b.button('✕', key=f'del_se_{i}', help='Remove this entry'):
+                    st.session_state.special_entries.pop(i)
+                    st.rerun()
 
     # ── Navigation ───────────────────────────────────────────────────────────
     col1, col2 = st.columns([2, 1])
     with col1:
         if st.button('Continue with these records →', type='primary'):
             manual = parse_manual_text(manual_text) if manual_text.strip() else []
-            all_issues = sort_issues(merge_issues(issues, manual))
+
+            # Apply holdings range filter to CrossRef issues only
+            if issues and start_vol_sel is not None and end_vol_sel is not None:
+                if start_vol_sel <= end_vol_sel:
+                    filtered_crossref = filter_by_holdings_range(issues, start_vol_sel, end_vol_sel)
+                    st.session_state.holdings_start_vol = start_vol_sel
+                    st.session_state.holdings_end_vol = end_vol_sel
+                else:
+                    st.error('First volume must be less than or equal to the last volume.')
+                    st.stop()
+            else:
+                filtered_crossref = issues
+
+            all_issues = sort_issues(merge_issues(filtered_crossref, manual))
+
+            # Special entries bypass the range filter and are appended at the end
+            all_issues = all_issues + list(st.session_state.special_entries)
 
             if not all_issues:
                 st.error(
@@ -219,8 +382,13 @@ elif st.session_state.step == 3:
     if issues and manual_text.strip():
         manual_preview = parse_manual_text(manual_text)
         if manual_preview:
+            active_crossref = (
+                filter_by_holdings_range(issues, start_vol_sel, end_vol_sel)
+                if start_vol_sel is not None and end_vol_sel is not None
+                else issues
+            )
             st.info(
-                f'You have **{len(issues)} CrossRef records** and '
+                f'You have **{len(active_crossref)} CrossRef records** and '
                 f'**{len(manual_preview)} manual records** — '
                 f'they will be merged. Manual records take priority if there is overlap.'
             )
@@ -284,13 +452,22 @@ elif st.session_state.step == 5:
     df = st.session_state.df
     manual_count = int((df['Source'] == 'Manual').sum()) if 'Source' in df.columns else 0
     crossref_count = int((df['Source'] == 'CrossRef').sum()) if 'Source' in df.columns else 0
+    missing_count = int(df['Missing / not owned'].sum()) if 'Missing / not owned' in df.columns else 0
+    special_count = int((df['Type'] != 'issue').sum()) if 'Type' in df.columns else 0
 
     st.write(
-        f'**{len(df)} issues** ready — {crossref_count} from CrossRef, '
-        f'{manual_count} added manually. '
-        'Edit any cell directly. Check **Has duplicate copy** for issues where '
-        'the library owns two physical copies (a second row will be added automatically).'
+        f'**{len(df)} records** — {crossref_count} from CrossRef, '
+        f'{manual_count} added manually'
+        + (f', {special_count} special (index/supplement)' if special_count else '')
+        + '.  \n'
+        'Edit any cell directly. '
+        'Check **Missing / not owned** for issues Hood College does not hold — '
+        'those rows will be excluded from the Excel export. '
+        'Check **Has duplicate copy** for issues where the library owns two physical copies.'
     )
+
+    if missing_count > 0:
+        st.info(f'{missing_count} rows currently marked as missing / not owned and will be excluded from export.')
 
     if manual_count > 0:
         st.warning(
@@ -306,12 +483,20 @@ elif st.session_state.step == 5:
             'Volume': st.column_config.TextColumn('Volume'),
             'Issue': st.column_config.TextColumn('Issue'),
             'Year': st.column_config.NumberColumn('Year', format='%d', min_value=1800, max_value=2100),
-            'Month': st.column_config.TextColumn('Month', help='3-letter abbreviation e.g. Apr — leave blank if unknown'),
+            'Month/Season': st.column_config.TextColumn(
+                'Month/Season',
+                help='3-letter month (Apr), combined months (Jan/Feb, Jan-Mar), or season (Spring, Fall/Winter). Leave blank if unknown.'
+            ),
             'Has duplicate copy': st.column_config.CheckboxColumn(
                 'Has duplicate copy',
                 help='Check if the library owns two physical copies of this issue'
             ),
+            'Missing / not owned': st.column_config.CheckboxColumn(
+                'Missing / not owned',
+                help='Check if Hood College does not hold this issue — it will be excluded from the Excel export'
+            ),
             'Source': st.column_config.TextColumn('Source', disabled=True),
+            'Type': st.column_config.TextColumn('Type', disabled=True),
         }
     )
 
@@ -342,11 +527,16 @@ elif st.session_state.step == 6:
 
     excel_buf = dataframe_to_excel(df, mms_id, holding_id, issn)
 
-    dup_count = int(df['Has duplicate copy'].sum()) if 'Has duplicate copy' in df.columns else 0
-    total_rows = len(df) + dup_count
+    missing_count = int(df['Missing / not owned'].sum()) if 'Missing / not owned' in df.columns else 0
+    exportable_df = df[~df['Missing / not owned']] if 'Missing / not owned' in df.columns else df
+    dup_count = int(exportable_df['Has duplicate copy'].sum()) if 'Has duplicate copy' in exportable_df.columns else 0
+    total_rows = len(exportable_df) + dup_count
     manual_count = int((df['Source'] == 'Manual').sum()) if 'Source' in df.columns else 0
 
-    st.success(f'Your Excel file is ready — **{total_rows} item rows** ({dup_count} duplicate copy rows included).')
+    st.success(
+        f'Your Excel file is ready — **{total_rows} item rows** '
+        f'({len(exportable_df)} issues + {dup_count} duplicate copy rows).'
+    )
 
     safe_title = ''.join(c if c.isalnum() or c in ' _-' else '' for c in title)[:30].strip()
     filename = f"items_{issn.replace('-', '')}_{safe_title}.xlsx".replace(' ', '_')
@@ -362,11 +552,18 @@ elif st.session_state.step == 6:
     st.divider()
     st.subheader('Summary')
 
-    col1, col2, col3, col4 = st.columns(4)
-    col1.metric('Issues found', len(df))
-    col2.metric('Duplicate copy rows', dup_count)
-    col3.metric('Total Excel rows', total_rows)
-    col4.metric('Manual entries', manual_count)
+    col1, col2, col3, col4, col5 = st.columns(5)
+    col1.metric('Total records', len(df))
+    col2.metric('Excluded (missing)', missing_count)
+    col3.metric('Exported records', len(exportable_df))
+    col4.metric('Duplicate copy rows', dup_count)
+    col5.metric('Total Excel rows', total_rows)
+
+    if missing_count > 0:
+        st.info(
+            f'{missing_count} records were marked as missing / not owned and excluded from the export. '
+            'They remain visible in the review table if you need to go back and change anything.'
+        )
 
     if manual_count > 0:
         st.warning(
