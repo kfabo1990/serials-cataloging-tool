@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.env
+*.xlsx
+!ISSN0046_4813_Archives_of_thantalogy_populated.xlsx
