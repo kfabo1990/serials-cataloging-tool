@@ -1,5 +1,5 @@
 """
-app.py — Serials Holdings Cataloging Tool (v1: Item Records Generator)
+app.py — Serials Holdings Cataloging Tool
 Hood College Library
 
 To run:  streamlit run app.py
@@ -16,18 +16,91 @@ from helpers import (
 # ── PAGE CONFIG ──────────────────────────────────────────────────────────────
 
 st.set_page_config(
-    page_title='Serials Cataloging Tool',
+    page_title='Serials Cataloging Tool — Hood College Library',
     page_icon='📚',
     layout='wide'
 )
 
-st.title('📚 Serials Holdings Cataloging Tool')
-st.caption('Hood College Library — v1: Alma Item Records Generator')
+# ── CUSTOM CSS ───────────────────────────────────────────────────────────────
+
+st.markdown("""
+<style>
+/* Tighten top padding */
+.block-container { padding-top: 1.5rem; }
+
+/* Home screen card styling */
+.tool-card {
+    background: #F2EDE5;
+    border: 1px solid #C9B99A;
+    border-radius: 8px;
+    padding: 1.75rem 1.75rem 1.25rem 1.75rem;
+    margin-bottom: 0.6rem;
+    min-height: 180px;
+}
+.tool-card-icon { font-size: 1.6rem; margin-bottom: 0.5rem; }
+.tool-card-title {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #2C2C2C;
+    margin: 0 0 0.6rem 0;
+}
+.tool-card-body {
+    color: #5A4F4A;
+    line-height: 1.65;
+    font-size: 0.95rem;
+    margin: 0;
+}
+.tool-card-phase {
+    margin-top: 1rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #7A2035;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+/* Home header */
+.home-header {
+    text-align: center;
+    padding: 2rem 0 2rem 0;
+    border-bottom: 1px solid #C9B99A;
+    margin-bottom: 2rem;
+}
+.home-title {
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: #7A2035;
+    margin: 0 0 0.3rem 0;
+}
+.home-subtitle {
+    font-size: 1rem;
+    color: #5A4F4A;
+    margin: 0;
+}
+/* Phase badge shown in wizard steps */
+.phase-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+.phase-tag {
+    display: inline-block;
+    background: #7A2035;
+    color: white;
+    padding: 0.2rem 0.65rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+</style>
+""", unsafe_allow_html=True)
 
 # ── SESSION STATE ────────────────────────────────────────────────────────────
 
 DEFAULTS = {
-    'step': 1,
+    'step': 0,
     'issn': None,
     'journal_title': '',
     'crossref_issues': [],
@@ -37,10 +110,8 @@ DEFAULTS = {
     'holding_id': '',
     'df': None,
     'crossref_done': False,
-    # Holdings range (set in Step 3)
     'holdings_start_vol': None,
     'holdings_end_vol': None,
-    # Special items: indexes, supplements, parts (accumulated in Step 3)
     'special_entries': [],
 }
 
@@ -53,24 +124,116 @@ def go(step: int):
     st.session_state.step = step
 
 
-# ── PROGRESS BAR ─────────────────────────────────────────────────────────────
+def show_home_link():
+    """Show a subtle Home link above the progress bar."""
+    if st.button('⌂  Home', key='home_link'):
+        go(0)
+        st.rerun()
 
-STEPS = ['ISSN', 'Confirm', 'Discover', 'Alma IDs', 'Review', 'Download']
-st.progress((st.session_state.step - 1) / (len(STEPS) - 1))
-cols = st.columns(len(STEPS))
-for i, label in enumerate(STEPS):
-    color = ':blue[**' if i + 1 == st.session_state.step else ''
-    end = '**]' if i + 1 == st.session_state.step else ''
-    cols[i].markdown(f'{color}{i + 1}. {label}{end}', unsafe_allow_html=False)
 
-st.divider()
+def show_phase1_progress():
+    STEPS = ['ISSN', 'Confirm', 'Discover', 'Alma IDs', 'Review', 'Download']
+    step = st.session_state.step
+    show_home_link()
+    st.markdown('<span class="phase-tag">Phase 1 — Item Records</span>', unsafe_allow_html=True)
+    st.progress((step - 1) / (len(STEPS) - 1))
+    cols = st.columns(len(STEPS))
+    for i, label in enumerate(STEPS):
+        if i + 1 == step:
+            cols[i].markdown(
+                f'<span style="color:#7A2035;font-weight:700">{i + 1}. {label}</span>',
+                unsafe_allow_html=True
+            )
+        else:
+            cols[i].markdown(f'{i + 1}. {label}')
+    st.divider()
+
+
+def show_phase2_progress():
+    STEPS = ['Load', 'Analysis', 'MARC Fields', 'Report']
+    step = st.session_state.step - 6   # step 7 → position 1, etc.
+    show_home_link()
+    st.markdown('<span class="phase-tag">Phase 2 — MARC Pattern Generator</span>', unsafe_allow_html=True)
+    st.progress((step - 1) / (len(STEPS) - 1))
+    cols = st.columns(len(STEPS))
+    for i, label in enumerate(STEPS):
+        if i + 1 == step:
+            cols[i].markdown(
+                f'<span style="color:#7A2035;font-weight:700">{i + 1}. {label}</span>',
+                unsafe_allow_html=True
+            )
+        else:
+            cols[i].markdown(f'{i + 1}. {label}')
+    st.divider()
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# STEP 0 — HOME SCREEN
+# ═══════════════════════════════════════════════════════════════════════════
+
+if st.session_state.step == 0:
+    st.markdown("""
+    <div class="home-header">
+        <p class="home-title">Serials Holdings Cataloging Tool</p>
+        <p class="home-subtitle">Hood College Library</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown('#### What would you like to do?')
+    st.write('')
+
+    col1, col2 = st.columns(2, gap='large')
+
+    with col1:
+        st.markdown("""
+        <div class="tool-card">
+            <div class="tool-card-icon">📋</div>
+            <p class="tool-card-title">Build an items list</p>
+            <p class="tool-card-body">
+                Start from an ISSN. The tool looks up journal issues via CrossRef,
+                lets you fill in any missing records, review and edit everything,
+                and exports a spreadsheet ready to import into Alma.
+            </p>
+            <p class="tool-card-phase">Phase 1 — Item Records Generator</p>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button('Start with Phase 1 →', type='primary',
+                     use_container_width=True, key='btn_p1'):
+            go(1)
+            st.rerun()
+
+    with col2:
+        st.markdown("""
+        <div class="tool-card">
+            <div class="tool-card-icon">📊</div>
+            <p class="tool-card-title">Analyze holdings pattern</p>
+            <p class="tool-card-body">
+                Already have an approved items list? Upload it and the tool
+                detects the publication pattern and generates MARC 21 holdings
+                fields (853 / 863 / 866) ready to paste into the Alma
+                holdings record.
+            </p>
+            <p class="tool-card-phase">Phase 2 — MARC Pattern Generator</p>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button('Start with Phase 2 →', type='primary',
+                     use_container_width=True, key='btn_p2'):
+            go(7)
+            st.rerun()
+
+    st.write('')
+    st.caption(
+        'Phase 1 must be completed before Phase 2 if you do not already have an items list. '
+        'Both phases can be run independently at any time.'
+    )
 
 
 # ═══════════════════════════════════════════════════════════════════════════
 # STEP 1 — ISSN / URL INPUT
 # ═══════════════════════════════════════════════════════════════════════════
 
-if st.session_state.step == 1:
+elif st.session_state.step == 1:
+    show_phase1_progress()
     st.header('Step 1 — Enter ISSN or Journal URL')
     st.write(
         'Type the ISSN directly (e.g. **0046-4813**), or paste any URL for the journal — '
@@ -88,22 +251,28 @@ if st.session_state.step == 1:
         label_visibility='collapsed'
     )
 
-    if st.button('Continue →', type='primary'):
-        if not user_input.strip():
-            st.error('Please enter an ISSN or a URL.')
-        else:
-            found = extract_issn(user_input.strip())
-            if found:
-                st.session_state.issn = found
-                st.session_state.crossref_done = False
-                go(2)
-                st.rerun()
+    col1, col2 = st.columns([2, 1])
+    with col1:
+        if st.button('Continue →', type='primary'):
+            if not user_input.strip():
+                st.error('Please enter an ISSN or a URL.')
             else:
-                st.error(
-                    'No ISSN found. An ISSN looks like **0046-4813** '
-                    '(four digits, a dash, four more digits). '
-                    'Please check and try again, or type just the ISSN.'
-                )
+                found = extract_issn(user_input.strip())
+                if found:
+                    st.session_state.issn = found
+                    st.session_state.crossref_done = False
+                    go(2)
+                    st.rerun()
+                else:
+                    st.error(
+                        'No ISSN found. An ISSN looks like **0046-4813** '
+                        '(four digits, a dash, four more digits). '
+                        'Please check and try again, or type just the ISSN.'
+                    )
+    with col2:
+        if st.button('← Back to Home'):
+            go(0)
+            st.rerun()
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -111,6 +280,7 @@ if st.session_state.step == 1:
 # ═══════════════════════════════════════════════════════════════════════════
 
 elif st.session_state.step == 2:
+    show_phase1_progress()
     st.header('Step 2 — Confirm ISSN')
     st.info(f'The ISSN found is: **{st.session_state.issn}**')
     st.write('Is this the correct ISSN for the journal you want to catalog?')
@@ -131,6 +301,7 @@ elif st.session_state.step == 2:
 # ═══════════════════════════════════════════════════════════════════════════
 
 elif st.session_state.step == 3:
+    show_phase1_progress()
     st.header('Step 3 — Discover Journal Issues')
     issn = st.session_state.issn
 
@@ -147,7 +318,6 @@ elif st.session_state.step == 3:
     issues = st.session_state.crossref_issues
     title = st.session_state.journal_title
 
-    # ── What CrossRef returned ───────────────────────────────────────────────
     if title:
         st.subheader(f'"{title}"')
 
@@ -175,7 +345,6 @@ elif st.session_state.step == 3:
 
     st.divider()
 
-    # ── Hood College holdings range ──────────────────────────────────────────
     start_vol_sel = None
     end_vol_sel = None
 
@@ -190,7 +359,6 @@ elif st.session_state.step == 3:
                 "that Hood College physically owns — records outside this range will be excluded."
             )
 
-            # Restore previous selection if the user navigated back
             saved_start = st.session_state.holdings_start_vol
             saved_end = st.session_state.holdings_end_vol
             start_default = vols_sorted.index(saved_start) if saved_start in vols_sorted else 0
@@ -223,8 +391,6 @@ elif st.session_state.step == 3:
                 else:
                     st.caption(f'All {len(issues)} CrossRef records are within this range.')
 
-            # TODO: For active / ongoing subscriptions the "last volume" approach needs revisiting.
-            # Check with supervisor about how to handle journals Hood is still currently receiving.
             st.caption(
                 '📝 *Note: this assumes Hood\'s run of the journal has a definite end. '
                 'If Hood is still actively receiving this journal, check with your supervisor '
@@ -233,7 +399,6 @@ elif st.session_state.step == 3:
 
     st.divider()
 
-    # ── Manual supplement ────────────────────────────────────────────────────
     st.subheader('Add records that CrossRef is missing')
     st.write(
         'If early volumes are missing, or this journal has no electronic version, '
@@ -270,7 +435,6 @@ elif st.session_state.step == 3:
 
     st.divider()
 
-    # ── Index and supplement entries ─────────────────────────────────────────
     st.subheader('Add index or supplement entries')
     st.write(
         'Use this for items that are not regular numbered issues: cumulative indexes, '
@@ -307,7 +471,6 @@ elif st.session_state.step == 3:
 
             submitted = st.form_submit_button('Add this entry')
 
-        # Process outside the form block
         if submitted:
             if not se_vol.strip():
                 st.error('Volume (or volume range) is required.')
@@ -341,13 +504,11 @@ elif st.session_state.step == 3:
                     st.session_state.special_entries.pop(i)
                     st.rerun()
 
-    # ── Navigation ───────────────────────────────────────────────────────────
     col1, col2 = st.columns([2, 1])
     with col1:
         if st.button('Continue with these records →', type='primary'):
             manual = parse_manual_text(manual_text) if manual_text.strip() else []
 
-            # Apply holdings range filter to CrossRef issues only
             if issues and start_vol_sel is not None and end_vol_sel is not None:
                 if start_vol_sel <= end_vol_sel:
                     filtered_crossref = filter_by_holdings_range(issues, start_vol_sel, end_vol_sel)
@@ -360,8 +521,6 @@ elif st.session_state.step == 3:
                 filtered_crossref = issues
 
             all_issues = sort_issues(merge_issues(filtered_crossref, manual))
-
-            # Special entries bypass the range filter and are appended at the end
             all_issues = all_issues + list(st.session_state.special_entries)
 
             if not all_issues:
@@ -399,6 +558,7 @@ elif st.session_state.step == 3:
 # ═══════════════════════════════════════════════════════════════════════════
 
 elif st.session_state.step == 4:
+    show_phase1_progress()
     st.header('Step 4 — Enter Alma Record IDs')
     st.write(
         'These two values are the same for every row in the spreadsheet. '
@@ -447,6 +607,7 @@ elif st.session_state.step == 4:
 # ═══════════════════════════════════════════════════════════════════════════
 
 elif st.session_state.step == 5:
+    show_phase1_progress()
     st.header('Step 5 — Review & Edit Item Records')
 
     df = st.session_state.df
@@ -517,6 +678,7 @@ elif st.session_state.step == 5:
 # ═══════════════════════════════════════════════════════════════════════════
 
 elif st.session_state.step == 6:
+    show_phase1_progress()
     st.header('Step 6 — Download & Import')
 
     df = st.session_state.df
@@ -573,7 +735,7 @@ elif st.session_state.step == 6:
         )
 
     st.divider()
-    st.subheader('Next steps')
+    st.subheader('Next steps in Alma')
     st.markdown(
         '1. Open the downloaded Excel file and verify it looks correct  \n'
         '2. In Alma, go to any page → three dots menu (⋮) → **Cloud App Center**  \n'
@@ -583,7 +745,106 @@ elif st.session_state.step == 6:
     )
 
     st.divider()
-    if st.button('Start over with a new journal'):
-        for key in list(st.session_state.keys()):
-            del st.session_state[key]
+
+    col1, col2, col3 = st.columns([2, 2, 1])
+    with col1:
+        if st.button(
+            'Continue to Phase 2 — Analyze MARC Pattern →',
+            type='primary',
+            help='Use the approved items list to generate 853/863/866 MARC holdings fields'
+        ):
+            go(7)
+            st.rerun()
+    with col2:
+        if st.button('Start over with a new journal'):
+            for key in list(st.session_state.keys()):
+                del st.session_state[key]
+            st.rerun()
+    with col3:
+        if st.button('← Back'):
+            go(5)
+            st.rerun()
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# STEP 7 — PHASE 2 ENTRY: LOAD ITEMS LIST
+# ═══════════════════════════════════════════════════════════════════════════
+
+elif st.session_state.step == 7:
+    show_phase2_progress()
+    st.header('Step 1 — Load Items List')
+
+    if st.session_state.get('all_issues'):
+        title = st.session_state.get('journal_title', '') or st.session_state.get('issn', '')
+        st.success(
+            f'Continuing from Phase 1 — **{len(st.session_state["all_issues"])} item records** '
+            f'loaded{(" for " + title) if title else ""}.'
+        )
+        st.write('These records will be used for the pattern analysis.')
+
+        col1, col2 = st.columns([2, 1])
+        with col1:
+            if st.button('Analyze this items list →', type='primary'):
+                go(8)
+                st.rerun()
+        with col2:
+            if st.button('← Back to Phase 1'):
+                go(6)
+                st.rerun()
+
+        st.divider()
+        st.write('Or upload a different items file instead:')
+
+    else:
+        st.write(
+            'Upload an items list to analyze. The tool accepts two file formats:'
+        )
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown("""
+            <div class="tool-card" style="min-height:120px;">
+                <p class="tool-card-title" style="font-size:0.95rem;">Phase 1 export format</p>
+                <p class="tool-card-body" style="font-size:0.88rem;">
+                Excel file generated by this tool's Phase 1 step,
+                with columns: Volume, Issue, Year, Month/Season, etc.
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
+        with col2:
+            st.markdown("""
+            <div class="tool-card" style="min-height:120px;">
+                <p class="tool-card-title" style="font-size:0.95rem;">Alma export format</p>
+                <p class="tool-card-body" style="font-size:0.88rem;">
+                Excel file exported directly from Alma's physical items list,
+                with columns: Year, Volume, Description, etc.
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
+
+    uploaded_file = st.file_uploader(
+        'Upload items list (.xlsx)',
+        type=['xlsx'],
+        label_visibility='collapsed'
+    )
+
+    if uploaded_file:
+        st.info(f'File uploaded: **{uploaded_file.name}** — analysis coming in the next build.')
+
+    if not st.session_state.get('all_issues'):
+        st.write('')
+        if st.button('← Back to Home'):
+            go(0)
+            st.rerun()
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# STEP 8+ — PHASE 2 ANALYSIS (COMING NEXT)
+# ═══════════════════════════════════════════════════════════════════════════
+
+elif st.session_state.step >= 8:
+    show_phase2_progress()
+    st.header('Pattern Analysis')
+    st.info('Phase 2 analysis is being built. Check back soon.')
+    if st.button('← Back'):
+        go(7)
         st.rerun()
