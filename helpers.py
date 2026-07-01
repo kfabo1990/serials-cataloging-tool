@@ -315,12 +315,28 @@ def issues_to_dataframe(issues: list):
 
 # ── EXCEL EXPORT ─────────────────────────────────────────────────────────────
 
+def _sanitize_for_excel(value):
+    """
+    Prevent formula injection (CSV/Excel injection).
+    Excel treats any cell value starting with =, +, -, @, tab, or CR as a formula.
+    Prefixing with a single apostrophe neutralizes this — Excel displays the value
+    as plain text and does not execute it. Only affects values that start with
+    these characters; all normal data (IDs, months, descriptions) passes through unchanged.
+    """
+    if not isinstance(value, str):
+        return value
+    if value and value[0] in ('=', '+', '-', '@', '\t', '\r'):
+        return "'" + value
+    return value
+
+
 def dataframe_to_excel(df: pd.DataFrame, mms_id: str, holding_id: str, issn: str):
     """
     Convert the approved DataFrame into an Alma Item Import Excel file.
     - Rows marked 'Missing / not owned' are excluded.
     - mms_id and holding_id columns are forced to TEXT format.
     - Index and supplement rows generate appropriate enum fields.
+    - All user-sourced string values are sanitized against formula injection.
     """
     wb = Workbook()
     ws = wb.active
@@ -362,16 +378,16 @@ def dataframe_to_excel(df: pd.DataFrame, mms_id: str, holding_id: str, issn: str
             enum_b = f'n. {iss}' if iss else ''
 
         data_row = [
-            mms_id,
-            holding_id,
+            _sanitize_for_excel(mms_id),
+            _sanitize_for_excel(holding_id),
             barcode,
             'Journal - Issue',
             'Hood Serials Item',
             enum_a,
             enum_b,
             year_val if year_val is not None else '',
-            month,
-            desc,
+            _sanitize_for_excel(month),
+            _sanitize_for_excel(desc),
         ]
         ws.append(data_row)
 
@@ -379,7 +395,9 @@ def dataframe_to_excel(df: pd.DataFrame, mms_id: str, holding_id: str, issn: str
         if is_dup and item_type == 'issue':
             copy_row = list(data_row)
             copy_row[2] = make_barcode(issn, vol, iss, is_copy=True, item_type=item_type)
-            copy_row[9] = make_description(vol, iss, year_val, month, is_copy=True, item_type=item_type)
+            copy_row[9] = _sanitize_for_excel(
+                make_description(vol, iss, year_val, month, is_copy=True, item_type=item_type)
+            )
             ws.append(copy_row)
 
     # Force mms_id (col A) and holding_id (col B) to text — critical for Alma import

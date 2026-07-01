@@ -828,7 +828,36 @@ elif st.session_state.step == 7:
     )
 
     if uploaded_file:
-        st.info(f'File uploaded: **{uploaded_file.name}** — analysis coming in the next build.')
+        # File size check — reject anything over 10 MB
+        MAX_BYTES = 10 * 1024 * 1024
+        if uploaded_file.size > MAX_BYTES:
+            st.error(
+                f'File is too large ({uploaded_file.size / 1024 / 1024:.1f} MB). '
+                'Maximum allowed size is 10 MB. Please check you have uploaded the correct file.'
+            )
+        else:
+            # Verify it is actually a valid xlsx (not just a renamed file)
+            import zipfile
+            try:
+                raw = uploaded_file.read()
+                uploaded_file.seek(0)
+                with zipfile.ZipFile(uploaded_file) as z:
+                    names = z.namelist()
+                if '[Content_Types].xml' not in names or not any(
+                    n.startswith('xl/worksheets/') for n in names
+                ):
+                    raise ValueError('Missing expected xlsx internal structure.')
+                uploaded_file.seek(0)
+                st.info(
+                    f'File accepted: **{uploaded_file.name}** '
+                    f'({uploaded_file.size / 1024:.0f} KB) — '
+                    'analysis coming in the next build.'
+                )
+            except (zipfile.BadZipFile, ValueError):
+                st.error(
+                    'This file does not appear to be a valid Excel (.xlsx) file. '
+                    'Please check the file and try again.'
+                )
 
     if not st.session_state.get('all_issues'):
         st.write('')
