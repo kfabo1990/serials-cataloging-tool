@@ -8,6 +8,12 @@ A free, browser-based web application that helps library catalogers automate the
 
 ---
 
+## Workflow
+
+![Serials Holdings Cataloging Tool — complete workflow diagram](workflow_diagram.svg)
+
+---
+
 ## What it does
 
 The tool takes a journal ISSN, retrieves all known volumes and issues from the CrossRef API, guides the cataloger through building a correctly formatted Excel import file for Alma's **Items Creator** bulk import tool, and then analyzes the item records to generate the appropriate MARC 21 Holdings fields — all without inventing or guessing any data.

@@ -1,0 +1,150 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="1930" viewBox="0 0 880 1930" style="font-family:Georgia,serif;">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#6B5050"/></marker>
+  <filter id="sh" x="-8%" y="-8%" width="120%" height="130%">  <feDropShadow dx="1" dy="2" stdDeviation="2"     flood-color="#7A2035" flood-opacity="0.10"/></filter>
+</defs>
+<rect width="880" height="1930" fill="#FAF7F2"/>
+<rect x="0" y="0" width="880" height="80" fill="#7A2035"/>
+<text x="440.0" y="32.0" font-size="18" font-family="Georgia,serif" fill="#FFFFFF" text-anchor="middle" font-weight="bold">Serials Holdings Cataloging Tool</text>
+<text x="440.0" y="55.0" font-size="11.5" font-family="Georgia,serif" fill="#C8909E" text-anchor="middle" font-weight="normal">Workflow  ·  Phase 1: Item Records   →   Phase 2: MARC Holdings Fields</text>
+<text x="866.0" y="72.0" font-size="9" font-family="Georgia,serif" fill="#C8909E" text-anchor="end" font-weight="normal" font-style="italic">github.com/kfabo1990/serials-cataloging-tool</text>
+<rect x="0" y="88" width="880" height="36" fill="#5A1525"/>
+<rect x="0" y="88" width="5" height="36" fill="#C8909E"/>
+<text x="45.0" y="112.1" font-size="10.5" font-family="Georgia,serif" fill="#C8909E" text-anchor="middle" font-weight="bold">PHASE 1</text>
+<text x="440.0" y="112.1" font-size="13" font-family="Georgia,serif" fill="#FFFFFF" text-anchor="middle" font-weight="bold">Item Records Generator — produces the .xlsx file for Alma Items Creator</text>
+<rect x="293.0" y="142.0" width="294" height="52" rx="9" ry="9" fill="#F2EDE5" stroke="#7A2035" stroke-width="1.6" filter="url(#sh)"/>
+<text x="440.0" y="172.0" font-size="13" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">Enter ISSN or journal URL</text>
+<line x1="440.0" y1="194.0" x2="440.0" y2="219.0" stroke="#6B5050" stroke-width="1.8" marker-end="url(#arr)"/>
+<rect x="293.0" y="226.0" width="294" height="52" rx="9" ry="9" fill="#F2EDE5" stroke="#7A2035" stroke-width="1.6" filter="url(#sh)"/>
+<text x="440.0" y="256.0" font-size="13" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">CrossRef API lookup  (automatic, free, no account)</text>
+<line x1="440.0" y1="278.0" x2="440.0" y2="303.0" stroke="#6B5050" stroke-width="1.8" marker-end="url(#arr)"/>
+<polygon points="327.0,346.0 440.0,310.0 553.0,346.0 440.0,382.0" fill="#EAE3D8" stroke="#7A2035" stroke-width="1.6" filter="url(#sh)"/>
+<text x="440.0" y="342.5" font-size="12" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">Journal found</text>
+<text x="440.0" y="357.5" font-size="12" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">in CrossRef?</text>
+<line x1="440.0" y1="382.0" x2="440.0" y2="401.0" stroke="#6B5050" stroke-width="1.8" marker-end="url(#arr)"/>
+<text x="433.0" y="399.0" font-size="11" font-family="Georgia,serif" fill="#7A2035" text-anchor="end" font-weight="normal" font-style="italic">Yes</text>
+<line x1="553.0" y1="346.0" x2="622.0" y2="346.0" stroke="#6B5050" stroke-width="1.8" stroke-dasharray="5,3" marker-end="url(#arr)"/>
+<text x="591.0" y="340.0" font-size="11" font-family="Georgia,serif" fill="#7A2035" text-anchor="middle" font-weight="normal" font-style="italic">No</text>
+<rect x="629.0" y="318.0" width="150" height="56" rx="9" ry="9" fill="#F2EDE5" stroke="#7A2035" stroke-width="1.6" stroke-dasharray="6,3" filter="url(#sh)"/>
+<text x="704.0" y="333.0" font-size="13" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">No results —</text>
+<text x="704.0" y="350.0" font-size="13" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">manual entry</text>
+<text x="704.0" y="367.0" font-size="13" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">only</text>
+<rect x="293.0" y="408.0" width="294" height="52" rx="9" ry="9" fill="#F2EDE5" stroke="#7A2035" stroke-width="1.6" filter="url(#sh)"/>
+<text x="440.0" y="429.5" font-size="13" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">Auto-populate: volumes, issues &amp; dates</text>
+<text x="440.0" y="446.5" font-size="13" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">from CrossRef results</text>
+<line x1="704.0" y1="374.0" x2="704.0" y2="478.0" stroke="#6B5050" stroke-width="1.6" stroke-dasharray="5,3"/>
+<line x1="704.0" y1="478.0" x2="594.0" y2="478.0" stroke="#6B5050" stroke-width="1.8" stroke-dasharray="5,3" marker-end="url(#arr)"/>
+<circle cx="587.0" cy="478.0" r="4" fill="#7A2035" opacity="0.5"/>
+<line x1="440.0" y1="460.0" x2="440.0" y2="473.0" stroke="#6B5050" stroke-width="1.8" marker-end="url(#arr)"/>
+<circle cx="440.0" cy="478.0" r="4" fill="#7A2035" opacity="0.5"/>
+<line x1="440.0" y1="478.0" x2="440.0" y2="497.0" stroke="#6B5050" stroke-width="1.8" marker-end="url(#arr)"/>
+<rect x="293.0" y="504.0" width="294" height="52" rx="9" ry="9" fill="#F2EDE5" stroke="#7A2035" stroke-width="1.6" filter="url(#sh)"/>
+<text x="440.0" y="525.5" font-size="13" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">Set holdings range</text>
+<text x="440.0" y="542.5" font-size="13" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">(first &amp; last volume actually owned)</text>
+<line x1="440.0" y1="556.0" x2="440.0" y2="581.0" stroke="#6B5050" stroke-width="1.8" marker-end="url(#arr)"/>
+<polygon points="327.0,624.0 440.0,588.0 553.0,624.0 440.0,660.0" fill="#EAE3D8" stroke="#7A2035" stroke-width="1.6" filter="url(#sh)"/>
+<text x="440.0" y="620.5" font-size="12" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">Gaps or issues</text>
+<text x="440.0" y="635.5" font-size="12" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">not in CrossRef?</text>
+<line x1="440.0" y1="660.0" x2="440.0" y2="679.0" stroke="#6B5050" stroke-width="1.8" marker-end="url(#arr)"/>
+<text x="433.0" y="677.0" font-size="11" font-family="Georgia,serif" fill="#7A2035" text-anchor="end" font-weight="normal" font-style="italic">No</text>
+<line x1="553.0" y1="624.0" x2="622.0" y2="624.0" stroke="#6B5050" stroke-width="1.8" stroke-dasharray="5,3" marker-end="url(#arr)"/>
+<text x="591.0" y="618.0" font-size="11" font-family="Georgia,serif" fill="#7A2035" text-anchor="middle" font-weight="normal" font-style="italic">Yes</text>
+<rect x="629.0" y="596.0" width="150" height="56" rx="9" ry="9" fill="#F2EDE5" stroke="#7A2035" stroke-width="1.6" stroke-dasharray="6,3" filter="url(#sh)"/>
+<text x="704.0" y="611.0" font-size="13" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">Paste manually</text>
+<text x="704.0" y="628.0" font-size="13" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">extracted records</text>
+<text x="704.0" y="645.0" font-size="13" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">(one issue per line)</text>
+<line x1="704.0" y1="652.0" x2="704.0" y2="740.0" stroke="#6B5050" stroke-width="1.6" stroke-dasharray="5,3"/>
+<line x1="704.0" y1="740.0" x2="594.0" y2="740.0" stroke="#6B5050" stroke-width="1.8" stroke-dasharray="5,3" marker-end="url(#arr)"/>
+<circle cx="587.0" cy="740.0" r="4" fill="#7A2035" opacity="0.5"/>
+<rect x="293.0" y="688.0" width="294" height="52" rx="9" ry="9" fill="#F2EDE5" stroke="#7A2035" stroke-width="1.6" filter="url(#sh)"/>
+<text x="440.0" y="709.5" font-size="13" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">Review &amp; edit issue table</text>
+<text x="440.0" y="726.5" font-size="13" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">(all retrieved &amp; manual records combined)</text>
+<circle cx="440.0" cy="740.0" r="4" fill="#7A2035" opacity="0.5"/>
+<line x1="440.0" y1="740.0" x2="440.0" y2="761.0" stroke="#6B5050" stroke-width="1.8" marker-end="url(#arr)"/>
+<polygon points="327.0,804.0 440.0,768.0 553.0,804.0 440.0,840.0" fill="#EAE3D8" stroke="#7A2035" stroke-width="1.6" filter="url(#sh)"/>
+<text x="440.0" y="800.5" font-size="12" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">Add indexes or</text>
+<text x="440.0" y="815.5" font-size="12" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">supplements?</text>
+<line x1="440.0" y1="840.0" x2="440.0" y2="859.0" stroke="#6B5050" stroke-width="1.8" marker-end="url(#arr)"/>
+<text x="447.0" y="857.0" font-size="11" font-family="Georgia,serif" fill="#7A2035" text-anchor="start" font-weight="normal" font-style="italic">No</text>
+<line x1="327.0" y1="804.0" x2="258.0" y2="804.0" stroke="#6B5050" stroke-width="1.8" stroke-dasharray="5,3" marker-end="url(#arr)"/>
+<text x="289.0" y="798.0" font-size="11" font-family="Georgia,serif" fill="#7A2035" text-anchor="middle" font-weight="normal" font-style="italic">Yes</text>
+<rect x="101.0" y="776.0" width="150" height="56" rx="9" ry="9" fill="#F2EDE5" stroke="#7A2035" stroke-width="1.6" stroke-dasharray="6,3" filter="url(#sh)"/>
+<text x="176.0" y="791.0" font-size="13" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">Add index volumes,</text>
+<text x="176.0" y="808.0" font-size="13" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">supplements, parts</text>
+<text x="176.0" y="825.0" font-size="13" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">or other specials</text>
+<line x1="176.0" y1="832.0" x2="176.0" y2="920.0" stroke="#6B5050" stroke-width="1.6" stroke-dasharray="5,3"/>
+<line x1="176.0" y1="920.0" x2="286.0" y2="920.0" stroke="#6B5050" stroke-width="1.8" stroke-dasharray="5,3" marker-end="url(#arr)"/>
+<circle cx="293.0" cy="920.0" r="4" fill="#7A2035" opacity="0.5"/>
+<rect x="293.0" y="868.0" width="294" height="52" rx="9" ry="9" fill="#F2EDE5" stroke="#7A2035" stroke-width="1.6" filter="url(#sh)"/>
+<text x="440.0" y="898.0" font-size="13" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">Mark any items as  'Missing / Not Owned'</text>
+<circle cx="440.0" cy="920.0" r="4" fill="#7A2035" opacity="0.5"/>
+<line x1="440.0" y1="920.0" x2="440.0" y2="939.0" stroke="#6B5050" stroke-width="1.8" marker-end="url(#arr)"/>
+<rect x="293.0" y="946.0" width="294" height="52" rx="9" ry="9" fill="#3D6B4A" stroke="#3D6B4A" stroke-width="1.6" filter="url(#sh)"/>
+<text x="440.0" y="976.0" font-size="13" font-family="Georgia,serif" fill="#FFFFFF" text-anchor="middle" font-weight="normal">Download  .xlsx  import file</text>
+<line x1="440.0" y1="998.0" x2="440.0" y2="1019.0" stroke="#6B5050" stroke-width="1.8" marker-end="url(#arr)"/>
+<rect x="293.0" y="1026.0" width="294" height="52" rx="9" ry="9" fill="#3C5E78" stroke="#3C5E78" stroke-width="1.6" filter="url(#sh)"/>
+<text x="440.0" y="1056.0" font-size="13" font-family="Georgia,serif" fill="#FFFFFF" text-anchor="middle" font-weight="normal">Import into Alma — Items Creator bulk upload</text>
+<line x1="440.0" y1="1078.0" x2="440.0" y2="1103.0" stroke="#6B5050" stroke-width="1.8" marker-end="url(#arr)"/>
+<polygon points="327.0,1146.0 440.0,1110.0 553.0,1146.0 440.0,1182.0" fill="#EAE3D8" stroke="#7A2035" stroke-width="1.6" filter="url(#sh)"/>
+<text x="440.0" y="1142.5" font-size="12" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">Catalog holdings</text>
+<text x="440.0" y="1157.5" font-size="12" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">with MARC fields?</text>
+<line x1="553.0" y1="1146.0" x2="612.0" y2="1146.0" stroke="#6B5050" stroke-width="1.8" stroke-dasharray="5,3" marker-end="url(#arr)"/>
+<text x="586.0" y="1140.0" font-size="11" font-family="Georgia,serif" fill="#7A2035" text-anchor="middle" font-weight="normal" font-style="italic">No</text>
+<rect x="619.0" y="1124.0" width="170" height="44" rx="22" ry="22" fill="#5A1525" filter="url(#sh)"/>
+<text x="704.0" y="1151.0" font-size="13" font-family="Georgia,serif" fill="#FFFFFF" text-anchor="middle" font-weight="bold">Phase 1 complete ✓</text>
+<line x1="440.0" y1="1182.0" x2="440.0" y2="1205.0" stroke="#6B5050" stroke-width="1.8" marker-end="url(#arr)"/>
+<text x="433.0" y="1201.0" font-size="11" font-family="Georgia,serif" fill="#7A2035" text-anchor="end" font-weight="normal" font-style="italic">Yes</text>
+<rect x="0" y="1212" width="880" height="36" fill="#5A1525"/>
+<rect x="0" y="1212" width="5" height="36" fill="#C8909E"/>
+<text x="45.0" y="1236.1" font-size="10.5" font-family="Georgia,serif" fill="#C8909E" text-anchor="middle" font-weight="bold">PHASE 2</text>
+<text x="440.0" y="1236.1" font-size="13" font-family="Georgia,serif" fill="#FFFFFF" text-anchor="middle" font-weight="bold">MARC Holdings Field Generator — produces 853 / 863 / 866 fields</text>
+<rect x="293.0" y="1266.0" width="294" height="52" rx="9" ry="9" fill="#F2EDE5" stroke="#7A2035" stroke-width="1.6" filter="url(#sh)"/>
+<text x="440.0" y="1287.5" font-size="13" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">Load items: continue from Phase 1</text>
+<text x="440.0" y="1304.5" font-size="13" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">OR upload a Phase 1 / Alma export file</text>
+<line x1="440.0" y1="1318.0" x2="440.0" y2="1339.0" stroke="#6B5050" stroke-width="1.8" marker-end="url(#arr)"/>
+<rect x="293.0" y="1346.0" width="294" height="52" rx="9" ry="9" fill="#F2EDE5" stroke="#7A2035" stroke-width="1.6" filter="url(#sh)"/>
+<text x="440.0" y="1367.5" font-size="13" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">Analyze publication pattern</text>
+<text x="440.0" y="1384.5" font-size="13" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">(frequency  ·  chronology  ·  transitions)</text>
+<line x1="440.0" y1="1398.0" x2="440.0" y2="1423.0" stroke="#6B5050" stroke-width="1.8" marker-end="url(#arr)"/>
+<polygon points="327.0,1466.0 440.0,1430.0 553.0,1466.0 440.0,1502.0" fill="#EAE3D8" stroke="#7A2035" stroke-width="1.6" filter="url(#sh)"/>
+<text x="440.0" y="1462.5" font-size="12" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">Pattern</text>
+<text x="440.0" y="1477.5" font-size="12" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">type?</text>
+<line x1="440.0" y1="1502.0" x2="440.0" y2="1518.0" stroke="#6B5050" stroke-width="1.6" stroke-dasharray="5,3"/>
+<line x1="176.0" y1="1518.0" x2="704.0" y2="1518.0" stroke="#6B5050" stroke-width="1.6" stroke-dasharray="5,3"/>
+<text x="176.0" y="1512.0" font-size="10.5" font-family="Georgia,serif" fill="#7A2035" text-anchor="middle" font-weight="normal" font-style="italic">Regular</text>
+<line x1="176.0" y1="1518.0" x2="176.0" y2="1534.0" stroke="#6B5050" stroke-width="1.6" stroke-dasharray="5,3"/>
+<text x="440.0" y="1512.0" font-size="10.5" font-family="Georgia,serif" fill="#7A2035" text-anchor="middle" font-weight="normal" font-style="italic">Irregular</text>
+<line x1="440.0" y1="1518.0" x2="440.0" y2="1534.0" stroke="#6B5050" stroke-width="1.6" stroke-dasharray="5,3"/>
+<text x="704.0" y="1512.0" font-size="10.5" font-family="Georgia,serif" fill="#7A2035" text-anchor="middle" font-weight="normal" font-style="italic">Mixed</text>
+<line x1="704.0" y1="1518.0" x2="704.0" y2="1534.0" stroke="#6B5050" stroke-width="1.6" stroke-dasharray="5,3"/>
+<rect x="102.0" y="1534.0" width="148" height="60" rx="9" ry="9" fill="#F2EDE5" stroke="#7A2035" stroke-width="1.6" stroke-dasharray="6,3" filter="url(#sh)"/>
+<text x="176.0" y="1551.0" font-size="13" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">853 + 863</text>
+<text x="176.0" y="1568.0" font-size="13" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">(Alma creates 866</text>
+<text x="176.0" y="1585.0" font-size="13" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">on save)</text>
+<rect x="366.0" y="1534.0" width="148" height="60" rx="9" ry="9" fill="#F2EDE5" stroke="#7A2035" stroke-width="1.6" stroke-dasharray="6,3" filter="url(#sh)"/>
+<text x="440.0" y="1551.0" font-size="13" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">866 textual</text>
+<text x="440.0" y="1568.0" font-size="13" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">statement</text>
+<text x="440.0" y="1585.0" font-size="13" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">only</text>
+<rect x="630.0" y="1534.0" width="148" height="60" rx="9" ry="9" fill="#F2EDE5" stroke="#7A2035" stroke-width="1.6" stroke-dasharray="6,3" filter="url(#sh)"/>
+<text x="704.0" y="1551.0" font-size="13" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">Both sections</text>
+<text x="704.0" y="1568.0" font-size="13" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">with correct</text>
+<text x="704.0" y="1585.0" font-size="13" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">linking</text>
+<line x1="176.0" y1="1594.0" x2="176.0" y2="1608.0" stroke="#6B5050" stroke-width="1.6" stroke-dasharray="5,3"/>
+<line x1="440.0" y1="1594.0" x2="440.0" y2="1608.0" stroke="#6B5050" stroke-width="1.6" stroke-dasharray="5,3"/>
+<line x1="704.0" y1="1594.0" x2="704.0" y2="1608.0" stroke="#6B5050" stroke-width="1.6" stroke-dasharray="5,3"/>
+<line x1="176.0" y1="1608.0" x2="704.0" y2="1608.0" stroke="#6B5050" stroke-width="1.6" stroke-dasharray="5,3"/>
+<circle cx="440.0" cy="1608.0" r="4" fill="#7A2035" opacity="0.5"/>
+<line x1="440.0" y1="1608.0" x2="440.0" y2="1621.0" stroke="#6B5050" stroke-width="1.8" marker-end="url(#arr)"/>
+<rect x="293.0" y="1628.0" width="294" height="52" rx="9" ry="9" fill="#F2EDE5" stroke="#7A2035" stroke-width="1.6" filter="url(#sh)"/>
+<text x="440.0" y="1649.5" font-size="13" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">Review &amp; edit generated MARC fields</text>
+<text x="440.0" y="1666.5" font-size="13" font-family="Georgia,serif" fill="#2C2C2C" text-anchor="middle" font-weight="normal">(editable text — adjust before copying)</text>
+<line x1="440.0" y1="1680.0" x2="440.0" y2="1701.0" stroke="#6B5050" stroke-width="1.8" marker-end="url(#arr)"/>
+<rect x="293.0" y="1708.0" width="294" height="52" rx="9" ry="9" fill="#3C5E78" stroke="#3C5E78" stroke-width="1.6" filter="url(#sh)"/>
+<text x="440.0" y="1738.0" font-size="13" font-family="Georgia,serif" fill="#FFFFFF" text-anchor="middle" font-weight="normal">Copy fields → Alma Metadata Editor → Save</text>
+<line x1="440.0" y1="1760.0" x2="440.0" y2="1781.0" stroke="#6B5050" stroke-width="1.8" marker-end="url(#arr)"/>
+<rect x="293.0" y="1788.0" width="294" height="52" rx="9" ry="9" fill="#3D6B4A" stroke="#3D6B4A" stroke-width="1.6" filter="url(#sh)"/>
+<text x="440.0" y="1818.0" font-size="13" font-family="Georgia,serif" fill="#FFFFFF" text-anchor="middle" font-weight="normal">Download cataloging report  (.txt)</text>
+<line x1="440.0" y1="1840.0" x2="440.0" y2="1857.0" stroke="#6B5050" stroke-width="1.8" marker-end="url(#arr)"/>
+<rect x="293.0" y="1864.0" width="294" height="44" rx="22" ry="22" fill="#5A1525" filter="url(#sh)"/>
+<text x="440.0" y="1891.0" font-size="13" font-family="Georgia,serif" fill="#FFFFFF" text-anchor="middle" font-weight="bold">Holdings cataloging complete ✓</text>
+</svg>
